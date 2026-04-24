@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TestPlatform — Test yuklash</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet" />
+    <link href="assets/css/style.css" rel="stylesheet" />
+    <style>
+      .upload-area {
+        border: 2px dashed #dee2e6;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fafbfc;
+      }
+      .upload-area:hover,
+      .upload-area.dragover {
+        border-color: #4361ee;
+        background-color: #eef0ff;
+      }
+      .preview-row:hover {
+        background-color: #f8f9fa;
+      }
+    </style>
+  </head>
+  <body class="dashboard-page">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="dashboard.html">
+          <i class="fas fa-graduation-cap me-2"></i>TestPlatform
+        </a>
+        <div class="d-flex align-items-center gap-3">
+          <span class="text-white" id="userName"></span>
+          <a
+            href="dashboard.html"
+            class="btn btn-outline-light btn-sm rounded-pill">
+            <i class="fas fa-arrow-left me-1"></i>Qaytish
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-5">
+              <h4 class="fw-bold mb-4 text-center">
+                <i class="fas fa-cloud-upload-alt text-primary me-2"></i>Test
+                faylini yuklash
+              </h4>
+
+              <!-- Upload Area -->
+              <div
+                class="upload-area rounded-4 p-5 text-center"
+                id="uploadArea">
+                <input
+                  type="file"
+                  id="fileInput"
+                  accept=".doc,.docx,.txt"
+                  class="d-none" />
+                <i class="fas fa-file-word fa-4x text-muted mb-3"></i>
+                <h5 class="fw-semibold mb-2">
+                  .doc, .docx yoki .txt faylni tashlang
+                </h5>
+                <p class="text-muted mb-3">
+                  yoki
+                  <a
+                    href="#"
+                    onclick="
+                      document.getElementById('fileInput').click();
+                      return false;
+                    "
+                    class="text-primary fw-semibold"
+                    >fayl tanlang</a
+                  >
+                </p>
+                <p class="small text-muted mb-0">
+                  Format: savol matni, variantlar, to'g'ri javob
+                  <code>#</code> bilan belgilangan
+                </p>
+              </div>
+
+              <div class="mt-3" id="fileInfo"></div>
+
+              <!-- Parse Result Preview -->
+              <div class="mt-4 d-none" id="parsePreview">
+                <h5 class="fw-bold mb-3">
+                  <i class="fas fa-eye text-success me-2"></i>Fayl tahlili
+                  natijasi
+                </h5>
+                <div class="alert alert-info py-2 rounded-pill">
+                  <i class="fas fa-info-circle me-2"></i>Jami:
+                  <strong id="totalParsed">0</strong> ta savol topildi. Testda
+                  tasodifiy <strong>50</strong> tasi chiqadi.
+                </div>
+                <div class="table-responsive rounded-3">
+                  <table class="table table-bordered table-hover mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th style="width: 50px">#</th>
+                        <th>Savol</th>
+                        <th style="width: 120px">To'g'ri javob</th>
+                      </tr>
+                    </thead>
+                    <tbody id="previewTable"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Subject Input -->
+              <div class="mt-4 d-none" id="subjectSection">
+                <label class="form-label fw-semibold">Fan nomi</label>
+                <input
+                  type="text"
+                  class="form-control form-control-lg rounded-pill"
+                  id="subjectInput"
+                  placeholder="Masalan: Matematika, Tarix, Fizika..." />
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-flex gap-3 mt-4 d-none" id="actionButtons">
+                <button
+                  class="btn btn-primary btn-lg rounded-pill flex-grow-1"
+                  onclick="saveTest()">
+                  <i class="fas fa-save me-2"></i>Saqlash va testni boshlash
+                </button>
+                <button
+                  class="btn btn-outline-secondary btn-lg rounded-pill"
+                  onclick="resetUpload()">
+                  <i class="fas fa-redo me-2"></i>Qayta yuklash
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instructions -->
+          <div class="card border-0 shadow-sm rounded-4 mt-4">
+            <div class="card-body p-4">
+              <h6 class="fw-bold">
+                <i class="fas fa-info-circle text-info me-2"></i>Fayl formati
+                qanday bo'lishi kerak?
+              </h6>
+              <div class="bg-light rounded-3 p-3 mt-3 font-monospace small">
+                1. Dunyoning eng katta qit'asi qaysi?<br />
+                A) Afrika<br />
+                B) Yevropa<br />
+                # C) Osiyo<br />
+                D) Amerika<br />
+                <br />
+                2. 2+2=?<br />
+                A) 3<br />
+                # B) 4<br />
+                C) 5<br />
+                D) 6
+              </div>
+              <p class="text-muted small mt-2 mb-0">
+                <code>#</code> belgisi variant <strong>oldida</strong> yoki
+                <strong>orqasida</strong> bo'lishi mumkin. Bo'sh qator
+                (<code>Enter</code>) savollarni bir-biridan ajratadi.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script>
+      // ================= AUTH CHECK =================
+      const user = JSON.parse(localStorage.getItem("currentUser"));
+      if (!user) window.location.href = "login.html";
+      document.getElementById("userName").textContent = user.name;
+
+      let parsedQuestions = [];
+      const uploadArea = document.getElementById("uploadArea");
+      const fileInput = document.getElementById("fileInput");
+
+      // ================= DRAG & DROP =================
+      ["dragenter", "dragover"].forEach((evt) => {
+        uploadArea.addEventListener(evt, (e) => {
+          e.preventDefault();
+          uploadArea.classList.add("dragover");
+        });
+      });
+      ["dragleave", "drop"].forEach((evt) => {
+        uploadArea.addEventListener(evt, (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove("dragover");
+        });
+      });
+
+      uploadArea.addEventListener("drop", (e) => {
+        const file = e.dataTransfer.files[0];
+        if (file) handleFile(file);
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files[0]) handleFile(e.target.files[0]);
+      });
+
+      // ================= FILE HANDLING =================
+      function handleFile(file) {
+        document.getElementById("fileInfo").innerHTML = `
+        <div class="alert alert-success rounded-pill d-flex align-items-center shadow-sm">
+          <i class="fas fa-file-check me-2"></i>
+          <span><strong>${file.name}</strong> (${(file.size / 1024).toFixed(1)} KB) tanlandi</span>
+        </div>
+      `;
+
+        if (file.name.endsWith(".txt")) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            parsedQuestions = parseQuestions(e.target.result);
+            if (parsedQuestions.length === 0) {
+              showAlert(
+                "warning",
+                "Savollar topilmadi. Fayl formatini tekshiring.",
+              );
+              resetUpload();
+            } else {
+              showPreview();
+            }
+          };
+          reader.readAsText(file, "UTF-8");
+        } else {
+          showAlert(
+            "info",
+            ".doc/.docx fayllar hozircha demo rejimda. Namuna savollar yuklanadi.",
+          );
+          parsedQuestions = getDemoQuestions();
+          setTimeout(showPreview, 800);
+        }
+      }
+
+      // ================= PARSING ENGINE =================
+      function parseQuestions(text) {
+        const questions = [];
+        // Bo'sh qatorlar bo'yicha savollarga ajratamiz
+        const blocks = text.split(/\n\s*\n/).filter((b) => b.trim());
+
+        blocks.forEach((block) => {
+          const lines = block
+            .trim()
+            .split("\n")
+            .map((l) => l.trim())
+            .filter((l) => l);
+          if (lines.length < 3) return; // Kamida savol + 2 ta variant
+
+          const questionText = lines[0].replace(/^\d+[\.\)]\s*/, "").trim();
+          let correctAnswer = "";
+          const options = [];
+
+          for (let i = 1; i < lines.length; i++) {
+            let line = lines[i];
+            const hasHash = line.includes("#");
+
+            // # belgisini va atrofidagi bo'shliqlarni olib tashlash
+            let cleanLine = line.replace(/\s*#\s*/g, "").trim();
+
+            // Variant formatini tekshirish: A) yoki A.
+            const match = cleanLine.match(/^([A-Da-dёЁ])[\.\)]\s*(.*)/);
+
+            if (match) {
+              const letter = match[1].toUpperCase().replace("Ё", "E");
+              const optText = match[2].trim();
+              options.push({ letter, text: optText });
+              if (hasHash) correctAnswer = letter;
+            }
+          }
+
+          if (questionText && options.length >= 2 && correctAnswer) {
+            questions.push({ question: questionText, options, correctAnswer });
+          }
+        });
+
+        return questions;
+      }
+
+      // ================= PREVIEW & SAVE =================
+      function showPreview() {
+        document.getElementById("parsePreview").classList.remove("d-none");
+        document.getElementById("subjectSection").classList.remove("d-none");
+        document.getElementById("actionButtons").classList.remove("d-none");
+        document.getElementById("totalParsed").textContent =
+          parsedQuestions.length;
+
+        const table = document.getElementById("previewTable");
+        table.innerHTML = "";
+        const showCount = Math.min(parsedQuestions.length, 8);
+
+        for (let i = 0; i < showCount; i++) {
+          const q = parsedQuestions[i];
+          table.innerHTML += `
+          <tr class="preview-row">
+            <td class="fw-bold">${i + 1}</td>
+            <td class="text-truncate" style="max-width: 300px;">${q.question}</td>
+            <td><span class="badge bg-success rounded-pill">${q.correctAnswer}</span></td>
+          </tr>
+        `;
+        }
+
+        if (parsedQuestions.length > showCount) {
+          table.innerHTML += `<tr><td colspan="3" class="text-center text-muted small">... va yana ${parsedQuestions.length - showCount} ta savol</td></tr>`;
+        }
+      }
+
+      function saveTest() {
+        const subject =
+          document.getElementById("subjectInput").value.trim() || "Umumiy fan";
+        const fileName = fileInput.files[0]?.name || "Yuklangan test";
+        const testId = "test_" + Date.now();
+
+        const test = {
+          id: testId,
+          fileName,
+          subject,
+          totalQuestions: parsedQuestions.length,
+          questions: parsedQuestions,
+          createdAt: new Date().toISOString(),
+        };
+
+        // LocalStorage ga saqlash
+        const userTests = JSON.parse(
+          localStorage.getItem("tests_" + user.email) || "[]",
+        );
+        userTests.push(test);
+        localStorage.setItem("tests_" + user.email, JSON.stringify(userTests));
+        localStorage.setItem("currentTest", JSON.stringify(test));
+
+        showAlert(
+          "success",
+          `"${subject}" fani testi muvaffaqiyatli saqlandi! ${parsedQuestions.length} ta savol.`,
+        );
+        setTimeout(() => (window.location.href = "test.html"), 1200);
+      }
+
+      function resetUpload() {
+        parsedQuestions = [];
+        fileInput.value = "";
+        document.getElementById("fileInfo").innerHTML = "";
+        document.getElementById("parsePreview").classList.add("d-none");
+        document.getElementById("subjectSection").classList.add("d-none");
+        document.getElementById("actionButtons").classList.add("d-none");
+        document.getElementById("subjectInput").value = "";
+      }
+
+      function getDemoQuestions() {
+        return [
+          {
+            question: "Dunyoning eng katta qit'asi qaysi?",
+            options: [
+              { letter: "A", text: "Afrika" },
+              { letter: "B", text: "Yevropa" },
+              { letter: "C", text: "Osiyo" },
+              { letter: "D", text: "Amerika" },
+            ],
+            correctAnswer: "C",
+          },
+          {
+            question: "2+2=?",
+            options: [
+              { letter: "A", text: "3" },
+              { letter: "B", text: "4" },
+              { letter: "C", text: "5" },
+              { letter: "D", text: "6" },
+            ],
+            correctAnswer: "B",
+          },
+          {
+            question: "O'zbekiston poytaxti?",
+            options: [
+              { letter: "A", text: "Samarqand" },
+              { letter: "B", text: "Toshkent" },
+              { letter: "C", text: "Buxoro" },
+              { letter: "D", text: "Andijon" },
+            ],
+            correctAnswer: "B",
+          },
+          {
+            question: "Suvning kimyoviy formulasi?",
+            options: [
+              { letter: "A", text: "CO2" },
+              { letter: "B", text: "H2O" },
+              { letter: "C", text: "NaCl" },
+              { letter: "D", text: "O2" },
+            ],
+            correctAnswer: "B",
+          },
+          {
+            question: "HTML nima?",
+            options: [
+              { letter: "A", text: "Dasturlash tili" },
+              { letter: "B", text: "Belgilash tili" },
+              { letter: "C", text: "Brauzer" },
+              { letter: "D", text: "Server" },
+            ],
+            correctAnswer: "B",
+          },
+        ];
+      }
+    </script>
+  </body>
+</html>

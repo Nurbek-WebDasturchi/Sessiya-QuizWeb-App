@@ -1,0 +1,17 @@
+# Node.js
+backend/node_modules/
+backend/dist/
+backend/build/
+
+# Python
+backend/__pycache__/
+backend/venv/
+backend/*.pyc
+
+# Environment & Secrets
+backend/.env
+backend/.env.local
+
+# OS
+.DS_Store
+Thumbs.db
